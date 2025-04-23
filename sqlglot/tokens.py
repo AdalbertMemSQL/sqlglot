@@ -100,6 +100,7 @@ class TokenType(AutoName):
     STAGE = auto()
     STREAMLIT = auto()
     VAR = auto()
+    PIPELINE = auto()
     BIT_STRING = auto()
     HEX_STRING = auto()
     BYTE_STRING = auto()

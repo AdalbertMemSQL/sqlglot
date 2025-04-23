@@ -1,5 +1,7 @@
-from sqlglot import Dialect, tokens, parser, generator, jsonpath
+from sqlglot import Dialect, tokens, parser, generator, jsonpath, Token, \
+    Tokenizer, TokenType
 from sqlglot.dialects.dialect import NormalizationStrategy
+import typing as t
 
 
 class SingleStore(Dialect):
@@ -50,7 +52,26 @@ class SingleStore(Dialect):
     }
 
     class Tokenizer(tokens.Tokenizer):
-        a = 1
+        BIT_STRINGS = [("b'", "'"), ("B'", "'"), ("0b", "")]
+        HEX_STRINGS = [("x'", "'"), ("X'", "'"), ("0x", "")]
+        IDENTIFIERS = ['"', '`']
+        QUOTES = ["'", '"']
+        STRING_ESCAPES = ["'", '"', "\\"]
+        COMMENTS = ["--", "#", ("/*", "*/")]
+
+        KEYWORDS = {
+            **Tokenizer.KEYWORDS,
+            "@@": TokenType.SESSION_PARAMETER,
+            "PIPELINE": TokenType.PIPELINE,
+            "YEAR": TokenType.YEAR,
+            "BSON": TokenType.JSONB,
+            "GEOGRAPHYPOINT": TokenType.GEOGRAPHY,
+            "IGNORE": TokenType.IGNORE,
+            "KEY": TokenType.KEY,
+            "START": TokenType.BEGIN
+        }
+
+        COMMANDS = {*tokens.Tokenizer.COMMANDS, TokenType.REPLACE} - {TokenType.SHOW}
 
     class JSONPathTokenizer(jsonpath.JSONPathTokenizer):
         a = 1
